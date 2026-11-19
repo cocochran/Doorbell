@@ -10,7 +10,7 @@ void load_env(const char* filename){
     char line[256];
     while (fgets(line, sizeof(line), file)){
         line[strcspn(line, "\n")] = 0;
-        if (line[0] == "#" || line[0] == '\0') continue;
+        if (line[0] == '#' || line[0] == '\0') continue;
 
         char *eq = strchr(line, '=');
         if (eq) {
@@ -25,7 +25,7 @@ int main (int argc, char* argv[]){
     load_env(".env");
     MQTTClient client;
     const char* url = getenv("URL");
-    int rc = MQTTClient_create(&client, url, MQTT_PERSISTENCE_NONE, NULL);
+    int rc = MQTTClient_create(&client, url, "doorbell", MQTTCLIENT_PERSISTENCE_NONE, NULL);
 
     if (rc != MQTTCLIENT_SUCCESS) {
         fprintf(stderr, "Failed to connect to MQTT broker.  Return code: %d\n", rc);
