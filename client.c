@@ -22,12 +22,22 @@ void load_env(const char* filename){
     fclose(file);
 }
 
-int main (int argc, char* argv[]){
+int pass_payload_to_broker(MQTTClient client, MQTTClient_message msg, MQTTClient_deliveryToken token, Payload* payload){
+    msg.payload = payload;
+    msg.retained = 0;
+    int rc;
+
+    rc = MQTTClient_publishMessage(client, RESPONSE, &msg, &token);
+
+    if (rc != MQTTCLIENT_SUCCESS){
+        fprintf(stderr, "Failed to publish message.  Return code: %d\n", rc);
+        exit(EXIT_FAILURE);
+    } 
+    return rc;
+}
+
+int initialize_session(MQTTClient client, MQTTClient_message msg, MQTTClient_connectOptions connection_options){
     load_env(".env");
-    MQTTClient client;
-    MQTTClient_message msg = MQTTClient_message_initializer;
-    MQTTClient_connectOptions connection_options = MQTTClient_connectOptions_initializer;
-    MQTTClient_deliveryToken token;
     const char* url = getenv("URL");
     int rc; 
     
@@ -49,18 +59,6 @@ int main (int argc, char* argv[]){
     }
 }
 
-int pass_payload_to_broker(MQTTClient client, MQTTClient_message msg, MQTTClient_deliveryToken token, Payload* payload){
-    msg.payload = payload;
-    msg.retained = 0;
-    int rc;
 
-    rc = MQTTClient_publishMessage(client, RESPONSE, &msg, &token);
-
-    if (rc != MQTTCLIENT_SUCCESS){
-        fprintf(stderr, "Failed to publish message.  Return code: %d\n", rc);
-        exit(EXIT_FAILURE);
-    } 
-    return rc;
-}
 
 
