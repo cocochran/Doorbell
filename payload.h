@@ -2,9 +2,14 @@
 #define PAYLOAD_H
 #include <stdint.h>
 
-typedef enum Payload : uint8_t {
+#define CALL "CALL"
+#define RESPONSE "RESPONSE"
+
+typedef enum Payload {
     NO = 0,
     YES = 1
 } Payload;
+
+
 
 #endif
