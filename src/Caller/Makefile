@@ -1,6 +1,6 @@
 CC      := gcc
 TARGET  := doorbell
-SRCDIR  := src/Caller
+SRCDIR  := .
 SRCS    := $(SRCDIR)/main.c $(SRCDIR)/client.c
 OBJS    := $(SRCS:.c=.o)
 DEPS    := $(OBJS:.o=.d)
@@ -8,7 +8,7 @@ DEPS    := $(OBJS:.o=.d)
 CFLAGS  := -std=gnu2x -I. -I$(SRCDIR) -Wall -Wextra -g $(shell pkg-config --cflags gtk4)
 LDLIBS  := $(shell pkg-config --libs gtk4) -lpaho-mqtt3c
 
-.PHONY: all clean FORCE
+.PHONY: all clean
 
 all: $(TARGET)
 
@@ -21,9 +21,9 @@ $(TARGET): $(OBJS)
 # Every object may include client.h, so make sure it exists first.
 $(OBJS): $(SRCDIR)/client.h
 
-# Regenerated on every make from the function definitions in client.c.
-# Only replaced when its contents change, so unchanged builds don't recompile.
-$(SRCDIR)/client.h: FORCE
+# Regenerated from the function definitions in client.c whenever client.c changes.
+$(SRCDIR)/client.h: $(SRCDIR)/client.c
+	@echo "Generating $@"
 	@{ \
 		echo '/* Generated from client.c by make. Do not edit. */'; \
 		echo '#ifndef CLIENT_H'; \
@@ -35,12 +35,9 @@ $(SRCDIR)/client.h: FORCE
 			sub(/[[:space:]]*\{[[:space:]]*$$/, ";"); print }' $(SRCDIR)/client.c; \
 		echo; \
 		echo '#endif'; \
-	} > $@.tmp
-	@if cmp -s $@.tmp $@; then rm -f $@.tmp; else mv $@.tmp $@; echo "Generated $@"; fi
-
-FORCE:
+	} > $@
 
 clean:
-	rm -f $(TARGET) $(OBJS) $(DEPS) $(SRCDIR)/client.h $(SRCDIR)/client.h.tmp
+	rm -f $(TARGET) $(OBJS) $(DEPS) $(SRCDIR)/client.h
 
 -include $(DEPS)
