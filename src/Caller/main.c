@@ -1,25 +1,21 @@
 #include "client.h"
 #include "payload.h"
-
-#if defined(__has_include)
-#  if __has_include(<gtk/gtk.h>)
-#    include <gtk/gtk.h>
-#  elif __has_include(<gtk-4.0/gtk/gtk.h>)
-#    include <gtk-4.0/gtk/gtk.h>
-#  elif __has_include(<gtk-3.0/gtk/gtk.h>)
-#    include <gtk-3.0/gtk/gtk.h>
-#  else
-#    include <gtk/gtk.h>
-#  endif
-#else
-#  include <gtk/gtk.h>
-#endif
+#include <gtk/gtk.h>
 
 
 
-static void button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer user_data) {
+
+static void button_press_event(
+    GtkWidget *widget, 
+    GdkEvent *event, 
+    gpointer user_data,
+    MQTTClient* client,
+    MQTTClient_message* msg,
+    MQTTClient_deliveryToken* token,
+    Payload* payload
+    ) {
     if (event->type == GDK_BUTTON_PRESS && event->button == 1) {
-        send_payload();
+        pass_payload_to_broker();
     }
 }
 static void activate(GtkApplication *app, gpointer user_data) {
@@ -37,5 +33,14 @@ int main(int argc, char **argv) {
     g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
     int status = g_application_run(G_APPLICATION(app), argc, argv);
     g_object_unref(app);
+
+    MQTTClient client;
+    MQTTClient_message msg;
+    MQTTClient_deliveryToken token;
+    MQTTClient_connectOptions connection_options;
+    Payload payload;
+
+    initialize_session(&client, &msg, &connection_options);
+    
     return status;
 }
