@@ -59,6 +59,18 @@ int initialize_session(MQTTClient* client, MQTTClient_message* msg, MQTTClient_c
     }
 }
 
+int deinitialize_session(MQTTClient* client){
+    int rc;
+    rc = MQTTClient_disconnect(client, TIMEOUT);
+    if (rc != MQTTCLIENT_SUCCESS){
+        fprintf(stderr, "Failed to disconnect.  Return code: %d\n", rc);
+        exit(EXIT_FAILURE);
+    }
+
+    MQTTClient_destroy(client);
+    return rc;
+}
+
 
 
 

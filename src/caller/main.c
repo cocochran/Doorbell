@@ -34,6 +34,11 @@ static void activate(GtkApplication *app, gpointer user_data) {
     gtk_window_present(GTK_WINDOW(window));
 }
 
+static void on_shutdown(GtkApplication *app, gpointer user_data){
+    AppState *state = user_data;
+    deinitialize_session(state->client);
+}
+
 
 int main(int argc, char **argv) {
     AppState state = {0};
@@ -41,6 +46,8 @@ int main(int argc, char **argv) {
 
     GtkApplication *app = gtk_application_new("com.example.doorbell", G_APPLICATION_DEFAULT_FLAGS);
     g_signal_connect(app, "activate", G_CALLBACK(activate), &state);
+    g_signal_connect(app, "shutdown", G_CALLBACK(on_shutdown), &state);
+
     int status = g_application_run(G_APPLICATION(app), argc, argv);
     g_object_unref(app);
 

@@ -4,6 +4,7 @@
 
 #define CALL "CALL"
 #define RESPONSE "RESPONSE"
+#define TIMEOUT 10000
 
 typedef enum Payload {
     NO = 0,
